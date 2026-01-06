@@ -15,13 +15,7 @@ def get_temperatures(db: Session,
 def get_temperature_by_city(
     db: Session, city_id: int, skip: int = 0, limit: int = 10
 ) -> List[Temperature]:
-    return (
-        db.query(Temperature)
-        .filter(Temperature.city_id == city_id)
-        .offset(skip)
-        .limit(limit)
-        .all()
-    )
+    return db.query(Temperature).filter(Temperature.city_id == city_id).offset(skip).limit(limit).all()
 
 
 def get_temperature(db: Session, temperature_id: int) -> Optional[Temperature]:
@@ -54,7 +48,7 @@ def update_temperature(
 
 
 def delete_temperature(db: Session, temperature_id: int) -> bool:
-    db_temp = db.query(Temperature, temperature_id)
+    db_temp = db.get(Temperature, temperature_id)
     if not db_temp:
         return False
     db.delete(db_temp)

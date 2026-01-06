@@ -11,6 +11,7 @@ class TemperatureBase(BaseModel):
 
 class TemperatureCreate(TemperatureBase):
     city_id: int
+    date_time: datetime
 
 
 class TemperatureUpdate(BaseModel):

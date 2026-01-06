@@ -3,11 +3,14 @@ from sqlalchemy.orm import relationship
 
 from database import Base
 
+
 class City(Base):
-    __tablename__ ="cities"
+    __tablename__ = "cities"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False, unique=True, index=True)
     additional_info = Column(Text, nullable=True)
 
-    temperatures = relationship("Temperature", back_populates="city", cascade="all, delete-orphan")
+    temperatures = relationship(
+        "Temperature", back_populates="city", cascade="all, delete-orphan"
+    )

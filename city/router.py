@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from fastapi import Depends
 from sqlalchemy.orm import Session
+from starlette import status
 
 from city import crud
 from city.schemas import City, CityCreate, CityUpdate
@@ -12,9 +13,7 @@ router = APIRouter(prefix="/cities", tags=["cities"])
 
 
 @router.get("/", response_model=List[City])
-def read_cities(skip: int = 0,
-                limit: int = 10,
-                db: Session = Depends(get_db)):
+def read_cities(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     return crud.get_cities(db, skip=skip, limit=limit)
 
 
@@ -41,7 +40,7 @@ def update_city(city_id: int,
     return db_city
 
 
-@router.delete("/{city_id}", response_model=City)
+@router.delete("/{city_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_city(city_id: int, db: Session = Depends(get_db)):
     if not crud.delete_city(db, city_id=city_id):
         raise HTTPException(status_code=404, detail="City not found")

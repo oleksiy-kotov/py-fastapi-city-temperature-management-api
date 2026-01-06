@@ -10,7 +10,7 @@ from city.crud import get_cities
 from city.models import City
 from dependencies import get_db
 from temperature import schemas, crud
-from temperature.crud import create_temperature, get_temperatures, get_temperature_by_city
+from temperature.crud import create_temperature
 from temperature.schemas import TemperatureCreate
 
 router = APIRouter(prefix="/temperatures", tags=["temperatures"])
@@ -35,11 +35,12 @@ async def fetch_temperature_for_city(city: City) -> float | None:
     lon = geo_response.json()["results"][0]["longitude"]
 
     weather_url = "https://api.open-meteo.com/v1/forecast"
-    weather_params = {"latitude": lat,
-                      "longitude": lon,
-                      "current": "temperature_2m",
-                      "timezone": "UTC"
-                      }
+    weather_params = {
+        "latitude": lat,
+        "longitude": lon,
+        "current": "temperature_2m",
+        "timezone": "UTC",
+    }
     try:
         weather_response = await client.get(weather_url, params=weather_params)
         weather_response.raise_for_status()
@@ -53,7 +54,9 @@ async def fetch_temperature_for_city(city: City) -> float | None:
 async def update_all_temperatures(db: Session = Depends(get_db)):
     cities = get_cities(db=db, skip=0, limit=1000)
     if not cities:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="City not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="City not found"
+        )
 
     tasks = [fetch_temperature_for_city(city) for city in cities]
     temperatures = await asyncio.gather(*tasks, return_exceptions=True)
@@ -69,10 +72,14 @@ async def update_all_temperatures(db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[schemas.Temperature])
-def read_all_temperatures(city_id: int | None = None,
-                          skip: int = 0, limit: int = 100,
-                          db: Session = Depends(get_db)):
+def read_all_temperatures(
+    city_id: int | None = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
     if city_id is not None:
-        return crud.get_temperature_by_city(db=db, city_id=city_id, skip=skip, limit=limit)
+        return crud.get_temperature_by_city(
+            db=db, city_id=city_id, skip=skip, limit=limit
+        )
     return crud.get_temperatures(db=db, skip=skip, limit=limit)
-

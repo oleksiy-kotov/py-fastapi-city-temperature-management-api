@@ -10,9 +10,11 @@ from city.schemas import CityCreate, CityUpdate
 def get_city(db: Session, city_id: int) -> Optional[City]:
     return db.get(City, city_id)
 
+
 # Get all cities from db
 def get_cities(db: Session, skip: int = 0, limit: int = 10) -> List[City]:
     return db.query(City).offset(skip).limit(limit).all()
+
 
 # Create city
 def create_city(db: Session, city_in: CityCreate) -> City:
@@ -23,7 +25,10 @@ def create_city(db: Session, city_in: CityCreate) -> City:
     db.refresh(db_city)
     return db_city
 
-def update_city(db: Session, city_id: int, city_in: CityUpdate) -> Optional[City]:
+
+def update_city(db: Session,
+                city_id: int,
+                city_in: CityUpdate) -> Optional[City]:
     db_city = db.get(City, city_id)
     if not db_city:
         return None
@@ -36,6 +41,7 @@ def update_city(db: Session, city_id: int, city_in: CityUpdate) -> Optional[City
     db.commit()
     db.refresh(db_city)
     return db_city
+
 
 def delete_city(db: Session, city_id: int) -> bool:
     db_city = db.get(City, city_id)
